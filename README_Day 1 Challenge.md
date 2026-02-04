@@ -263,39 +263,7 @@ Risk % = Base Score + Environment + Exposure + Function + Data Residency + AI Co
 
 ---
 
-## 🗺️ Roadmap
 
-### Future Enhancements
-- [ ] Export to CSV/PDF
-- [ ] Asset filtering and search
-- [ ] Batch import from Excel
-- [ ] API integration for automated feeds
-- [ ] Role-based access control
-- [ ] Persistent storage option
-- [ ] Multi-language support
-
----
-
-
-## 👥 Contributors
-
-| Role | Responsibility |
-|------|----------------|
-| Security Architect | Requirements, SIA methodology |
-| AI Engineer | Classification logic, risk model |
-| UI/UX Designer | Dashboard design, accessibility |
-| QA Analyst | Test data, validation |
-
----
-
-## 📞 Support
-
-For questions or issues:
-1. Review the exception handling registry
-2. Check the risk calculation summary
-3. Contact the project team
-
----
 
 ## 🏆 50-Day AI Challenge
 
