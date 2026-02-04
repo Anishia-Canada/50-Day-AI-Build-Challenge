@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Federated Asset Inventory Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-darker: #020617;
+            --card-gray: #334155;
+            --accent-cyan: #06b6d4;
+            --text-white: #f8fafc;
+            --text-gray: #94a3b8;
+            --success-green: #22c55e;
+            --warning-yellow: #eab308;
+            --warning-orange: #f97316;
+            --error-red: #ef4444;
+            --border-color: #475569;
+            --critical-red: #dc2626;
+            --high-orange: #ea580c;
+            --medium-yellow: #ca8a04;
+            --low-green: #16a34a;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-white);
+            font-family: 'Inter', system-ui, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .nav {
+            background-color: var(--bg-darker);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-brand .logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--card-gray);
+            border: 2px solid var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .nav-brand span {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 4px;
+            background-color: var(--card-gray);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .nav-tab {
+            padding: 8px 20px;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            color: var(--text-gray);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-white);
+        }
+
+        .nav-tab.active {
+            background-color: var(--accent-cyan);
+            color: var(--bg-dark);
+        }
+
+        .role-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .role-badge.admin {
+            background-color: rgba(34, 197, 94, 0.1);
+            border: 1px solid var(--success-green);
+            color: var(--success-green);
+        }
+
+        .role-badge.executive {
+            background-color: rgba(6, 182, 212, 0.1);
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        .role-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .role-badge.admin .dot {
+            background-color: var(--success-green);
+        }
+
+        .role-badge.executive .dot {
+            background-color: var(--accent-cyan);
+        }
+
+        /* Page Views */
+        .page-view {
+            display: none;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .page-view.active {
+            display: block;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+
+        .page-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+        }
+
+        .page-header p {
+            color: var(--text-gray);
+            margin: 0;
+            font-size: 14px;
+        }
+
+        /* Card */
+        .card {
+            background-color: var(--card-gray);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title svg {
+            color: var(--accent-cyan);
+        }
+
+        /* Input Area */
+        textarea {
+            width: 100%;
+            background-color: var(--bg-dark);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-white);
+            padding: 16px;
+            font-family: 'Inter', monospace;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 180px;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+        }
+
+        textarea::placeholder {
+            color: #64748b;
+        }
+
+        .helper-text {
+            color: var(--text-gray);
+            font-size: 12px;
+            margin-top: 12px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-cyan);
+            color: var(--bg-dark);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            filter: brightness(1.1);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-gray);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-cyan);
+            color: var(--text-white);
+        }
+
+        .btn-success {
+            background-color: var(--success-green);
+            color: white;
+        }
+
+        .btn-success:hover {
+            filter: brightness(1.1);
+        }
+
+        /* Processing Indicator */
+        .processing {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 32px;
+            gap: 12px;
+        }
+
+        .processing.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--accent-cyan);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Results Section */
+        .results {
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        /* Summary Bar */
+        .summary-bar {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .summary-item {
+            background-color: var(--bg-dark);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            border-left: 4px solid transparent;
+        }
+
+        .summary-item .value {
+            font-size: 28px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .summary-item .label {
+            font-size: 11px;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-item.critical {
+            border-left-color: var(--critical-red);
+        }
+
+        .summary-item.critical .value {
+            color: var(--critical-red);
+        }
+
+        .summary-item.high {
+            border-left-color: var(--high-orange);
+        }
+
+        .summary-item.high .value {
+            color: var(--high-orange);
+        }
+
+        .summary-item.medium {
+            border-left-color: var(--medium-yellow);
+        }
+
+        .summary-item.medium .value {
+            color: var(--medium-yellow);
+        }
+
+        .summary-item.low {
+            border-left-color: var(--low-green);
+        }
+
+        .summary-item.low .value {
+            color: var(--low-green);
+        }
+
+        .summary-item.total {
+            border-left-color: var(--accent-cyan);
+        }
+
+        .summary-item.total .value {
+            color: var(--accent-cyan);
+        }
+
+        /* Asset List */
+        .asset-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .asset-item {
+            background-color: var(--bg-dark);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .asset-header {
+            display: grid;
+            grid-template-columns: 1fr auto auto auto auto auto;
+            gap: 12px;
+            align-items: center;
+            padding: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .asset-header:hover {
+            background-color: rgba(6, 182, 212, 0.05);
+        }
+
+        .asset-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .asset-name small {
+            display: block;
+            color: var(--text-gray);
+            font-weight: 400;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .badge-critical {
+            background-color: rgba(220, 38, 38, 0.2);
+            color: var(--critical-red);
+        }
+
+        .badge-high {
+            background-color: rgba(234, 88, 12, 0.2);
+            color: var(--high-orange);
+        }
+
+        .badge-medium {
+            background-color: rgba(202, 138, 4, 0.2);
+            color: var(--medium-yellow);
+        }
+
+        .badge-low {
+            background-color: rgba(22, 163, 74, 0.2);
+            color: var(--low-green);
+        }
+
+        .badge-zone {
+            background-color: rgba(6, 182, 212, 0.2);
+            color: var(--accent-cyan);
+        }
+
+        .badge-type {
+            background-color: rgba(148, 163, 184, 0.2);
+            color: var(--text-gray);
+        }
+
+        .confidence-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+
+        .confidence-bar {
+            width: 50px;
+            height: 6px;
+            background-color: var(--border-color);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .confidence-fill.high {
+            background-color: var(--success-green);
+        }
+
+        .confidence-fill.medium {
+            background-color: var(--warning-yellow);
+        }
+
+        .confidence-fill.low {
+            background-color: var(--warning-orange);
+        }
+
+        .expand-icon {
+            color: var(--text-gray);
+            transition: transform 0.2s;
+        }
+
+        .asset-item.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .asset-details {
+            display: none;
+            padding: 0 16px 16px 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .asset-item.expanded .asset-details {
+            display: block;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            padding-top: 16px;
+        }
+
+        .detail-section h4 {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--accent-cyan);
+            margin: 0 0 8px 0;
+        }
+
+        .detail-section p {
+            font-size: 13px;
+            color: var(--text-gray);
+            margin: 4px 0;
+        }
+
+        .detail-section strong {
+            color: var(--text-white);
+        }
+
+        .flag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .flag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .flag-warning {
+            background-color: rgba(234, 179, 8, 0.2);
+            color: var(--warning-yellow);
+        }
+
+        .flag-error {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: var(--error-red);
+        }
+
+        .flag-info {
+            background-color: rgba(6, 182, 212, 0.2);
+            color: var(--accent-cyan);
+        }
+
+        /* Actions Bar */
+        .actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* ===================== DASHBOARD STYLES ===================== */
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background-color: var(--card-gray);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .metric-card.critical::before {
+            background-color: var(--critical-red);
+        }
+
+        .metric-card.high::before {
+            background-color: var(--high-orange);
+        }
+
+        .metric-card.medium::before {
+            background-color: var(--medium-yellow);
+        }
+
+        .metric-card.low::before {
+            background-color: var(--low-green);
+        }
+
+        .metric-card.total::before {
+            background-color: var(--accent-cyan);
+        }
+
+        .metric-value {
+            font-size: 36px;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .metric-card.critical .metric-value {
+            color: var(--critical-red);
+        }
+
+        .metric-card.high .metric-value {
+            color: var(--high-orange);
+        }
+
+        .metric-card.medium .metric-value {
+            color: var(--medium-yellow);
+        }
+
+        .metric-card.low .metric-value {
+            color: var(--low-green);
+        }
+
+        .metric-card.total .metric-value {
+            color: var(--accent-cyan);
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .chart-card {
+            background-color: var(--card-gray);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+        }
+
+        /* Risk Bar */
+        .risk-bar-card {
+            background-color: var(--card-gray);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .risk-bar {
+            display: flex;
+            height: 32px;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: var(--bg-dark);
+        }
+
+        .risk-segment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .risk-segment.critical {
+            background-color: var(--critical-red);
+        }
+
+        .risk-segment.high {
+            background-color: var(--high-orange);
+        }
+
+        .risk-segment.medium {
+            background-color: var(--medium-yellow);
+        }
+
+        .risk-segment.low {
+            background-color: var(--low-green);
+        }
+
+        .risk-legend {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 16px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-gray);
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 4px;
+        }
+
+        /* Flags Grid */
+        .flags-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .flag-card {
+            background-color: var(--bg-dark);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .flag-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .flag-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .flag-icon.warning {
+            background-color: rgba(234, 179, 8, 0.2);
+            color: var(--warning-yellow);
+        }
+
+        .flag-icon.error {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: var(--error-red);
+        }
+
+        .flag-icon.info {
+            background-color: rgba(6, 182, 212, 0.2);
+            color: var(--accent-cyan);
+        }
+
+        .flag-name {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .flag-count {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-white);
+        }
+
+        /* Department Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 12px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background-color: rgba(6, 182, 212, 0.05);
+        }
+
+        /* No Data State */
+        .no-data {
+            text-align: center;
+            padding: 60px 24px;
+            background-color: var(--card-gray);
+            border-radius: 12px;
+        }
+
+        .no-data h2 {
+            margin: 16px 0 8px 0;
+            font-size: 20px;
+        }
+
+        .no-data p {
+            color: var(--text-gray);
+            margin: 0 0 24px 0;
+        }
+
+        .last-updated {
+            text-align: right;
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+
+        .last-updated strong {
+            color: var(--text-white);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+
+            .metrics-grid,
+            .summary-bar {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .asset-header {
+                grid-template-columns: 1fr auto auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+
+            .metrics-grid,
+            .summary-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav {
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-brand">
+            <div class="logo">SSC</div>
+            <span>Federated Asset Inventory</span>
+        </div>
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-view="admin">Admin Console</button>
+            <button class="nav-tab" data-view="dashboard">Executive Dashboard</button>
+        </div>
+        <div class="role-badge admin" id="roleBadge">
+            <span class="dot"></span>
+            <span id="roleText">Admin</span>
+        </div>
+    </nav>
+
+    <!-- ===================== ADMIN VIEW ===================== -->
+    <div class="page-view active" id="adminView">
+        <div class="page-header">
+            <div>
+                <h1>Asset Analysis Console</h1>
+                <p>Paste asset information for AI-powered classification and risk assessment</p>
+            </div>
+        </div>
+
+        <!-- Input Card -->
+        <div class="card" id="inputCard">
+            <div class="card-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                Paste Asset List
+            </div>
+
+            <textarea id="assetInput"
+                placeholder="CRA-WEB-PORTAL-01, CRA
+Public citizen portal for tax filing, internet exposed, production, handles taxpayer PII and payment processing
+
+SSC-SRV-EMAIL-01, SSC
+Internal email server for departmental communications, production environment, protected B employee data
+
+PSPC-APP-REPORT-01, PSPC
+Internal reporting application for procurement analytics, business operational data, internal network only
+
+SSC-SRV-DEV-01, SSC
+Development server for testing new features, isolated network, sandbox environment, test data only, non-production"></textarea>
+
+            <div class="helper-text">
+                Supported formats: Asset Name, Department (first line) + Description (following lines).
+                Separate assets with blank lines.
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" id="analyzeBtn">Analyze Assets</button>
+                <button class="btn btn-secondary" id="clearBtn">Clear</button>
+            </div>
+        </div>
+
+        <!-- Processing Indicator -->
+        <div class="processing" id="processing">
+            <div class="spinner"></div>
+            <span>AI is analyzing assets...</span>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results" id="results">
+            <div class="summary-bar" id="summaryBar"></div>
+
+            <div class="card">
+                <div class="card-title">Analyzed Assets</div>
+                <div class="asset-list" id="assetList"></div>
+            </div>
+
+            <div class="actions-bar">
+                <button class="btn btn-secondary" id="newAnalysisBtn">New Analysis</button>
+                <button class="btn btn-success" id="publishBtn">View Executive Dashboard →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== DASHBOARD VIEW ===================== -->
+    <div class="page-view" id="dashboardView">
+        <div class="page-header">
+            <div>
+                <h1>Executive Dashboard</h1>
+                <p>Federal Asset Risk Overview - AI-Powered Analysis</p>
+            </div>
+            <div class="last-updated">
+                <strong>Last Analysis:</strong><br>
+                <span id="timestamp">No data</span>
+            </div>
+        </div>
+
+        <!-- No Data State -->
+        <div class="no-data" id="noData">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                style="color: var(--text-gray)">
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <h2>No Analysis Data Available</h2>
+            <p>Run an asset analysis from the Admin Console to populate this dashboard.</p>
+            <button class="btn btn-primary" id="goToAdminBtn">Go to Admin Console</button>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div id="dashboardContent" style="display: none;">
+            <div class="metrics-grid">
+                <div class="metric-card total">
+                    <span class="metric-value" id="totalAssets">0</span>
+                    <span class="metric-label">Total Assets</span>
+                </div>
+                <div class="metric-card critical">
+                    <span class="metric-value" id="criticalCount">0</span>
+                    <span class="metric-label">Critical Risk</span>
+                </div>
+                <div class="metric-card high">
+                    <span class="metric-value" id="highCount">0</span>
+                    <span class="metric-label">High Risk</span>
+                </div>
+                <div class="metric-card medium">
+                    <span class="metric-value" id="mediumCount">0</span>
+                    <span class="metric-label">Medium Risk</span>
+                </div>
+                <div class="metric-card low">
+                    <span class="metric-value" id="lowCount">0</span>
+                    <span class="metric-label">Low Risk</span>
+                </div>
+            </div>
+
+            <!-- Risk Distribution Bar -->
+            <div class="risk-bar-card">
+                <div class="chart-title">Risk Distribution</div>
+                <div class="risk-bar" id="riskBar"></div>
+                <div class="risk-legend">
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background-color: var(--critical-red)"></div>Critical (76-100%)
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background-color: var(--high-orange)"></div>High (51-75%)
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background-color: var(--medium-yellow)"></div>Medium (26-50%)
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background-color: var(--low-green)"></div>Low (0-25%)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-title">Assets by Risk Level</div>
+                    <div class="chart-container"><canvas id="riskChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title">Assets by Department</div>
+                    <div class="chart-container"><canvas id="deptChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Flags Summary -->
+            <div class="card">
+                <div class="card-title">Issues Requiring Attention</div>
+                <div class="flags-grid" id="flagsGrid"></div>
+            </div>
+
+            <!-- Department Table -->
+            <div class="card">
+                <div class="card-title">Department Breakdown</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Department</th>
+                            <th>Total</th>
+                            <th>Critical</th>
+                            <th>High</th>
+                            <th>Medium</th>
+                            <th>Low</th>
+                            <th>Avg Risk</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deptTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // GLOBAL STATE
+        // ============================================================
+        let analysisResults = null;
+        let riskChartInstance = null;
+        let deptChartInstance = null;
+
+        // ============================================================
+        // CONFIGURATION
+        // ============================================================
+        const CONFIG = {
+            departments: {
+                'CRA': ['cra', 'canada revenue', 'revenue agency'],
+                'DND': ['dnd', 'national defence', 'defense'],
+                'SSC': ['ssc', 'shared services'],
+                'PSPC': ['pspc', 'procurement', 'public services'],
+                'Service Ontario': ['service ontario', 'serviceontario', 'svcon'],
+                'City of Halifax': ['city of halifax', 'halifax', 'hfx']
+            },
+            departmentPrefixes: ['CRA-', 'DND-', 'SSC-', 'PSPC-', 'SVCON-', 'HFX-'],
+            assetTypeKeywords: {
+                'Server': ['srv', 'server', 'host', 'vm', 'instance'],
+                'Database': ['db', 'database', 'sql', 'oracle', 'postgresql', 'mysql'],
+                'Application': ['app', 'application', 'system', 'platform'],
+                'Network Device': ['net', 'fw', 'sw', 'firewall', 'switch', 'router', 'gateway'],
+                'Web Server': ['web', 'portal', 'website'],
+                'API': ['api', 'endpoint', 'rest', 'integration'],
+                'OT/SCADA': ['ot', 'scada', 'ics', 'plc', 'industrial', 'control system', 'hmi'],
+                'Endpoint': ['workstation', 'laptop', 'desktop'],
+                'Storage': ['storage', 'nas', 'san', 'backup', 'file server']
+            },
+            assetTypeRegex: {
+                'Server': /[-_](srv|svr|host|vm)[-_\d]/i,
+                'Database': /[-_](db|dbs|data)[-_\d]/i,
+                'Application': /[-_](app|ap|sys)[-_\d]/i,
+                'Network Device': /[-_](fw|sw|rt|rtr|net)[-_\d]/i,
+                'Web Server': /[-_](web|www|http)[-_\d]/i,
+                'API': /[-_](api|rest|svc)[-_\d]/i,
+                'OT/SCADA': /[-_](ot|scada|ics|plc|hmi)[-_\d]/i,
+                'Endpoint': /[-_](ws|pc|lt|dt)[-_\d]/i,
+                'Storage': /[-_](stor|nas|san|bkp|bak)[-_\d]/i
+            },
+            assetTypePriority: ['OT/SCADA', 'API', 'Web Server', 'Database', 'Network Device', 'Application', 'Storage', 'Endpoint', 'Server'],
+            dataCategoryKeywords: {
+                'Confidential': ['classified', 'secret', 'protected c', 'national security', 'scada', '911', 'emergency', 'critical infrastructure'],
+                'Private': ['citizen', 'taxpayer', 'personal', 'pii', 'protected b', 'health records', 'sin', 'financial', 'payment', 'credentials', 'password'],
+                'Sensitive': ['internal', 'protected a', 'business', 'operational', 'procurement', 'contract', 'vendor'],
+                'Public': ['public', 'open data', 'test', 'dev', 'development', 'staging', 'sandbox', 'lab', 'training', 'demo']
+            },
+            environmentKeywords: {
+                'Production': ['production', 'prod', 'live', 'operational'],
+                'Staging': ['staging', 'uat', 'pre-prod'],
+                'Development': ['development', 'dev', 'sandbox'],
+                'Test': ['test', 'testing', 'qa'],
+                'Lab': ['lab', 'training', 'poc', 'demo']
+            },
+            exposureKeywords: {
+                'Public-Facing': ['public-facing', 'internet exposed', 'external', 'citizen portal', 'public portal'],
+                'Partner-Facing': ['partner', 'extranet', 'b2b', 'vendor portal'],
+                'Internal': ['internal', 'intranet', 'backend', 'private'],
+                'Isolated': ['isolated', 'air-gapped', 'standalone']
+            },
+            functionKeywords: {
+                'Database': ['database', 'data store', 'repository', 'records'],
+                'Frontend': ['frontend', 'portal', 'user interface', 'citizen-facing'],
+                'API': ['api', 'integration', 'middleware', 'gateway'],
+                'Infrastructure': ['firewall', 'router', 'dns', 'authentication'],
+                'Backend': ['backend', 'processing', 'engine', 'batch', 'calculation'],
+                'Support': ['monitoring', 'logging', 'backup', 'reporting']
+            },
+            dataResidencyKeywords: {
+                'Stores': ['stores', 'database', 'repository', 'archive', 'persists'],
+                'Processes': ['processes', 'calculates', 'transforms', 'engine'],
+                'Transmits': ['transmits', 'relay', 'proxy'],
+                'None': ['no data', 'static']
+            },
+            problemKeywords: {
+                'UNPATCHED': ['unpatched', 'last patched', 'pending patch'],
+                'MISCATEGORIZED': ['miscategorized', 'incorrectly classified'],
+                'PUBLIC_FACING': ['public-facing', 'internet exposed'],
+                'UNKNOWN': ['unknown', 'no documentation', 'no owner', 'discovered during', 'orphan'],
+                'EOL': ['eol', 'end of life', 'end of support', 'windows server 2003', 'windows server 2008', 'windows xp']
+            },
+            adjustments: {
+                environment: { 'Production': 15, 'Staging': 5, 'Development': -15, 'Test': -20, 'Lab': -25, 'Unknown': 5 },
+                exposure: { 'Public-Facing': 20, 'Partner-Facing': 10, 'Internal': -5, 'Isolated': -15, 'Unknown': 5 },
+                function: { 'Database': 15, 'Frontend': 10, 'API': 10, 'Infrastructure': 5, 'Backend': 0, 'Support': -10, 'Unknown': 0 },
+                dataResidency: { 'Stores': 10, 'Processes': 5, 'Transmits': 0, 'None': -10, 'Unknown': 5 },
+                aiConfidence: { 'High': 0, 'Medium': 5, 'Low': 10, 'Unknown': 15 }
+            },
+            confidenceThresholds: { high: 0.85, medium: 0.65, low: 0.40 }
+        };
+
+        // ============================================================
+        // PARSING FUNCTIONS
+        // ============================================================
+        function parseAssets(inputText) {
+            const blocks = inputText.split(/\n\s*\n+/).filter(b => b.trim());
+            const assets = [];
+            const suggestedNames = [];
+
+            blocks.forEach((block, idx) => {
+                const asset = parseAssetBlock(block.trim(), idx, suggestedNames);
+                assets.push(asset);
+                if (asset.parsed.suggestedName) suggestedNames.push(asset.parsed.suggestedName);
+            });
+
+            return assets;
+        }
+
+        function parseAssetBlock(block, idx, existingSuggested) {
+            const lines = block.split('\n').map(l => l.trim()).filter(l => l);
+            const asset = {
+                raw: block,
+                parsed: { assetName: null, suggestedName: null, department: null, description: null },
+                parseStatus: 'success',
+                parseWarnings: [],
+                flags: [],
+                exceptionIds: []
+            };
+
+            if (lines.length === 0) { asset.parseStatus = 'error'; return asset; }
+
+            const firstLine = lines[0];
+            asset.parsed.description = lines.slice(1).join(' ').trim() || null;
+
+            if (firstLine.includes(',')) {
+                const parts = firstLine.split(',').map(p => p.trim());
+                asset.parsed.assetName = parts[0];
+                const normalized = normalizeDepartment(parts[1]);
+                asset.parsed.department = normalized.department;
+                if (!normalized.found) { asset.flags.push('UNKNOWN_DEPARTMENT'); asset.parseStatus = 'warning'; }
+            } else {
+                const normalized = normalizeDepartment(firstLine);
+                if (normalized.found) {
+                    asset.parsed.department = normalized.department;
+                    asset.parsed.suggestedName = generateSuggestedName(normalized.department, asset.parsed.description, existingSuggested);
+                    asset.flags.push('REQUIRES_NAMING');
+                    asset.parseStatus = 'warning';
+                } else {
+                    const extracted = extractDepartmentFromPrefix(firstLine);
+                    if (extracted.found) {
+                        asset.parsed.assetName = firstLine;
+                        asset.parsed.department = extracted.department;
+                        asset.flags.push('DEPT_INFERRED');
+                    } else {
+                        asset.parsed.assetName = firstLine;
+                        asset.flags.push('PARSE_ERROR');
+                        asset.parseStatus = 'error';
+                    }
+                }
+            }
+
+            if (!asset.parsed.description) {
+                asset.flags.push('NO_DESCRIPTION');
+                if (asset.parseStatus === 'success') asset.parseStatus = 'warning';
+            }
+
+            return asset;
+        }
+
+        function normalizeDepartment(input) {
+            const lower = (input || '').toLowerCase().trim();
+            for (const [standard, aliases] of Object.entries(CONFIG.departments)) {
+                if (aliases.some(a => lower === a || lower.includes(a))) return { department: standard, found: true };
+            }
+            return { department: input, found: false };
+        }
+
+        function extractDepartmentFromPrefix(name) {
+            const upper = (name || '').toUpperCase();
+            for (const prefix of CONFIG.departmentPrefixes) {
+                if (upper.startsWith(prefix)) {
+                    const code = prefix.replace('-', '');
+                    return { found: true, department: normalizeDepartment(code).department };
+                }
+            }
+            return { found: false, department: null };
+        }
+
+        function generateSuggestedName(dept, desc, existing) {
+            let type = 'SRV', func = 'ASSET';
+            const descLower = (desc || '').toLowerCase();
+            for (const [assetType, keywords] of Object.entries(CONFIG.assetTypeKeywords)) {
+                if (keywords.some(kw => descLower.includes(kw))) {
+                    type = { 'Server': 'SRV', 'Database': 'DB', 'Application': 'APP', 'Network Device': 'NET', 'Web Server': 'WEB', 'API': 'API', 'OT/SCADA': 'OT', 'Endpoint': 'EP', 'Storage': 'STOR' }[assetType] || 'SRV';
+                    break;
+                }
+            }
+            const funcMatch = descLower.match(/(?:for|handling|running)\s+(\w+)/i);
+            if (funcMatch) func = funcMatch[1].toUpperCase().substring(0, 8);
+            let name = `${dept}-${type}-${func}-DISC`;
+            let counter = 1;
+            while (existing.includes(name)) { name = `${dept}-${type}-${func}-DISC-${String(counter++).padStart(2, '0')}`; }
+            return name;
+        }
+
+        // ============================================================
+        // DETECTION FUNCTIONS
+        // ============================================================
+        function detectAssetType(name, desc) {
+            const nameLower = (name || '').toLowerCase();
+            const descLower = (desc || '').toLowerCase();
+
+            for (const type of CONFIG.assetTypePriority) {
+                if ((CONFIG.assetTypeKeywords[type] || []).some(kw => nameLower.includes(kw)))
+                    return { type, confidence: 'High', layer: 1, reasoning: `Name contains '${type.toLowerCase()}' keyword` };
+            }
+            for (const type of CONFIG.assetTypePriority) {
+                if ((CONFIG.assetTypeKeywords[type] || []).some(kw => descLower.includes(kw)))
+                    return { type, confidence: 'Medium', layer: 2, reasoning: `Description contains '${type.toLowerCase()}' keyword` };
+            }
+            for (const type of CONFIG.assetTypePriority) {
+                if (CONFIG.assetTypeRegex[type]?.test(name || ''))
+                    return { type, confidence: 'Medium', layer: 3, reasoning: `Name matches ${type} pattern` };
+            }
+            const contextClues = { 'Database': ['stores', 'records', 'repository'], 'Server': ['runs', 'processes', 'handles'], 'Web Server': ['portal', 'interface'], 'OT/SCADA': ['controls', 'sensors', 'water'] };
+            for (const [type, clues] of Object.entries(contextClues)) {
+                if (clues.some(c => descLower.includes(c))) return { type, confidence: 'Low', layer: 4, reasoning: `Context suggests ${type}` };
+            }
+            return { type: 'Unknown', confidence: null, layer: 5, reasoning: 'Could not determine type' };
+        }
+
+        function assessCriticality(name, desc) {
+            const combined = `${name || ''} ${desc || ''}`.toLowerCase();
+            for (const [category, keywords] of Object.entries(CONFIG.dataCategoryKeywords)) {
+                const matched = keywords.filter(kw => combined.includes(kw));
+                if (matched.length > 0) {
+                    const levelMap = { 'Confidential': 'Critical', 'Private': 'High', 'Sensitive': 'Medium', 'Public': 'Low' };
+                    return { level: levelMap[category], dataCategory: category, keywords: matched, reasoning: `Contains ${category.toLowerCase()} indicators: ${matched.join(', ')}` };
+                }
+            }
+            return { level: 'Medium', dataCategory: 'Unknown', keywords: [], reasoning: 'Defaulted to Medium - insufficient information' };
+        }
+
+        function calculateRisk(name, desc, assetType, criticality, aiConfScore) {
+            const combined = `${name || ''} ${desc || ''}`.toLowerCase();
+            const baseScores = { 'Low': 25, 'Medium': 50, 'High': 75, 'Critical': 100 };
+            const baseScore = baseScores[criticality.level] || 50;
+
+            const detectFactor = (text, keywordMap, defaultVal) => {
+                for (const [factor, keywords] of Object.entries(keywordMap)) {
+                    if (keywords.some(kw => text.includes(kw))) return factor;
+                }
+                return defaultVal;
+            };
+
+            const env = detectFactor(combined, CONFIG.environmentKeywords, 'Unknown');
+            const exp = detectFactor(combined, CONFIG.exposureKeywords, 'Unknown');
+            const func = detectFactor(combined, CONFIG.functionKeywords, 'Unknown');
+            const data = detectFactor(combined, CONFIG.dataResidencyKeywords, 'Unknown');
+            const confLevel = aiConfScore >= 0.85 ? 'High' : aiConfScore >= 0.65 ? 'Medium' : aiConfScore >= 0.40 ? 'Low' : 'Unknown';
+
+            const envAdj = CONFIG.adjustments.environment[env] ?? 5;
+            const expAdj = CONFIG.adjustments.exposure[exp] ?? 5;
+            const funcAdj = CONFIG.adjustments.function[func] ?? 0;
+            const dataAdj = CONFIG.adjustments.dataResidency[data] ?? 5;
+            const aiAdj = CONFIG.adjustments.aiConfidence[confLevel] ?? 15;
+
+            const total = Math.max(0, Math.min(100, baseScore + envAdj + expAdj + funcAdj + dataAdj + aiAdj));
+
+            let riskLevel = 'Low';
+            if (total > 75) riskLevel = 'Critical';
+            else if (total > 50) riskLevel = 'High';
+            else if (total > 25) riskLevel = 'Medium';
+
+            if (assetType.type === 'OT/SCADA') riskLevel = 'Critical';
+
+            return {
+                level: riskLevel,
+                percentage: total,
+                factors: { env, exp, func, data, aiConfidence: confLevel },
+                adjustments: { envAdj, expAdj, funcAdj, dataAdj, aiAdj },
+                reasoning: `Base ${baseScore}% + Env ${envAdj >= 0 ? '+' : ''}${envAdj}% + Exp ${expAdj >= 0 ? '+' : ''}${expAdj}% + Func ${funcAdj >= 0 ? '+' : ''}${funcAdj}% + Data ${dataAdj >= 0 ? '+' : ''}${dataAdj}% + AI ${aiAdj >= 0 ? '+' : ''}${aiAdj}% = ${total}%`
+            };
+        }
+
+        function recommendZone(assetType, criticality, risk) {
+            const env = risk.factors.env;
+            const dataCategory = criticality.dataCategory;
+            const isNonProd = ['Development', 'Test', 'Staging', 'Lab'].includes(env);
+
+            if (isNonProd) {
+                const zoneMap = { 'Development': 'DEV', 'Test': 'TEST', 'Staging': 'STAGING', 'Lab': 'LAB' };
+                return { zone: zoneMap[env] || 'DEV', environment: 'Non-Production', reasoning: `${env} environment` };
+            }
+            if (assetType.type === 'OT/SCADA') return { zone: 'HSZ', environment: 'Production', reasoning: 'OT/SCADA requires High Security Zone' };
+            if (dataCategory === 'Confidential') return { zone: 'HSZ', environment: 'Production', reasoning: 'Confidential data requires HSZ' };
+            if (dataCategory === 'Private') return { zone: 'REZ', environment: 'Production', reasoning: 'Private data requires REZ' };
+            if (risk.factors.exp === 'Public-Facing') return { zone: 'PAZ', environment: 'Production', reasoning: 'Public-facing asset' };
+            return { zone: 'OZ', environment: 'Production', reasoning: 'Standard Operations Zone' };
+        }
+
+        function detectProblems(desc) {
+            const problems = [];
+            const descLower = (desc || '').toLowerCase();
+            for (const [problem, keywords] of Object.entries(CONFIG.problemKeywords)) {
+                if (keywords.some(kw => descLower.includes(kw))) problems.push(problem);
+            }
+            return problems;
+        }
+
+        function calculateConfidence(parseStatus, assetType, criticality, hasDesc) {
+            const scores = [
+                parseStatus === 'success' ? 1.0 : parseStatus === 'warning' ? 0.7 : 0.3,
+                { 'High': 1.0, 'Medium': 0.7, 'Low': 0.4 }[assetType.confidence] || 0.2,
+                criticality.keywords.length > 0 ? 1.0 : 0.5,
+                hasDesc ? 1.0 : 0.5
+            ];
+            return scores.reduce((a, b) => a + b, 0) / scores.length;
+        }
+
+        // ============================================================
+        // MAIN ANALYSIS
+        // ============================================================
+        // Initialize state for history retention
+        let allAnalyzedAssets = [];
+
+        function analyzeAssets(inputText) {
+            const parsed = parseAssets(inputText);
+            return parsed.map(asset => {
+                if (asset.parseStatus === 'error') {
+                    return { ...asset, assetType: { type: 'Unknown' }, criticality: { level: 'Unknown' }, risk: { level: 'Unknown', percentage: 0 }, zone: { zone: 'Unknown' }, problems: [], confidence: 0 };
+                }
+
+                const name = asset.parsed.assetName || asset.parsed.suggestedName;
+                const desc = asset.parsed.description;
+
+                const assetType = detectAssetType(name, desc);
+                const criticality = assessCriticality(name, desc);
+                const confidence = calculateConfidence(asset.parseStatus, assetType, criticality, !!desc);
+                const risk = calculateRisk(name, desc, assetType, criticality, confidence);
+                const zone = recommendZone(assetType, criticality, risk);
+                const problems = detectProblems(desc);
+
+                problems.forEach(p => { if (!asset.flags.includes(p)) asset.flags.push(p); });
+
+                return { ...asset, assetType, criticality, risk, zone, problems, confidence };
+            });
+        }
+
+        // ============================================================
+        // ADMIN UI RENDERING
+        // ============================================================
+        function renderAdminResults(assets) {
+            const summary = { total: assets.length, Critical: 0, High: 0, Medium: 0, Low: 0 };
+            assets.forEach(a => { if (summary[a.risk.level] !== undefined) summary[a.risk.level]++; });
+
+            document.getElementById('summaryBar').innerHTML = `
+                <div class="summary-item total"><span class="value">${summary.total}</span><span class="label">Total</span></div>
+                <div class="summary-item critical"><span class="value">${summary.Critical}</span><span class="label">Critical</span></div>
+                <div class="summary-item high"><span class="value">${summary.High}</span><span class="label">High</span></div>
+                <div class="summary-item medium"><span class="value">${summary.Medium}</span><span class="label">Medium</span></div>
+                <div class="summary-item low"><span class="value">${summary.Low}</span><span class="label">Low</span></div>
+            `;
+
+            document.getElementById('assetList').innerHTML = assets.map((asset, idx) => {
+                const name = asset.parsed.assetName || asset.parsed.suggestedName || 'Unknown';
+                const dept = asset.parsed.department || 'Unknown';
+                const confPercent = Math.round(asset.confidence * 100);
+                const confClass = confPercent >= 85 ? 'high' : confPercent >= 65 ? 'medium' : 'low';
+
+                return `
+                    <div class="asset-item" data-idx="${idx}">
+                        <div class="asset-header">
+                            <div class="asset-name">${name}<small>${dept}${asset.parsed.suggestedName && !asset.parsed.assetName ? ' • AI Suggested' : ''}</small></div>
+                            <span class="badge badge-type">${asset.assetType.type}</span>
+                            <span class="badge badge-${asset.risk.level.toLowerCase()}">${asset.risk.level} (${asset.risk.percentage}%)</span>
+                            <span class="badge badge-zone">${asset.zone.zone}</span>
+                            <div class="confidence-display">
+                                <div class="confidence-bar"><div class="confidence-fill ${confClass}" style="width:${confPercent}%"></div></div>
+                                ${confPercent}%
+                            </div>
+                            <svg class="expand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="asset-details">
+                            <div class="detail-grid">
+                                <div class="detail-section">
+                                    <h4>Description</h4>
+                                    <p>${asset.parsed.description || 'No description provided'}</p>
+                                    ${asset.flags.length > 0 ? `<div class="flag-list">${asset.flags.map(f => `<span class="flag ${getFlagClass(f)}">${f}</span>`).join('')}</div>` : ''}
+                                </div>
+                                <div class="detail-section">
+                                    <h4>Asset Type Detection</h4>
+                                    <p><strong>Type:</strong> ${asset.assetType.type}</p>
+                                    <p><strong>Confidence:</strong> ${asset.assetType.confidence || 'N/A'} (Layer ${asset.assetType.layer})</p>
+                                    <p><strong>Reasoning:</strong> ${asset.assetType.reasoning}</p>
+                                </div>
+                                <div class="detail-section">
+                                    <h4>Criticality Assessment</h4>
+                                    <p><strong>Level:</strong> ${asset.criticality.level}</p>
+                                    <p><strong>Data Category:</strong> ${asset.criticality.dataCategory}</p>
+                                    <p><strong>Reasoning:</strong> ${asset.criticality.reasoning}</p>
+                                </div>
+                                <div class="detail-section">
+                                    <h4>Risk Calculation</h4>
+                                    <p><strong>Risk:</strong> ${asset.risk.level} (${asset.risk.percentage}%)</p>
+                                    <p><strong>Formula:</strong> ${asset.risk.reasoning}</p>
+                                    <p><strong>Zone:</strong> ${asset.zone.zone} - ${asset.zone.reasoning}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.querySelectorAll('.asset-item').forEach(item => {
+                item.querySelector('.asset-header').addEventListener('click', () => item.classList.toggle('expanded'));
+            });
+
+            analysisResults = { assets, summary, timestamp: new Date().toISOString() };
+        }
+
+        function getFlagClass(flag) {
+            if (['PARSE_ERROR', 'SECURITY_VIOLATION'].includes(flag)) return 'flag-error';
+            if (['REQUIRES_NAMING', 'UNKNOWN_DEPARTMENT', 'NO_DESCRIPTION', 'UNPATCHED', 'EOL', 'MISCATEGORIZED', 'UNKNOWN'].includes(flag)) return 'flag-warning';
+            return 'flag-info';
+        }
+
+        // ============================================================
+        // DASHBOARD RENDERING
+        // ============================================================
+        function renderDashboard() {
+            if (!analysisResults) {
+                document.getElementById('noData').style.display = 'block';
+                document.getElementById('dashboardContent').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('noData').style.display = 'none';
+            document.getElementById('dashboardContent').style.display = 'block';
+
+            const { assets, summary, timestamp } = analysisResults;
+
+            document.getElementById('timestamp').textContent = new Date(timestamp).toLocaleString();
+            document.getElementById('totalAssets').textContent = summary.total;
+            document.getElementById('criticalCount').textContent = summary.Critical;
+            document.getElementById('highCount').textContent = summary.High;
+            document.getElementById('mediumCount').textContent = summary.Medium;
+            document.getElementById('lowCount').textContent = summary.Low;
+
+            // Risk bar
+            const total = summary.total || 1;
+            document.getElementById('riskBar').innerHTML = `
+                ${summary.Critical > 0 ? `<div class="risk-segment critical" style="width:${(summary.Critical / total) * 100}%">${summary.Critical}</div>` : ''}
+                ${summary.High > 0 ? `<div class="risk-segment high" style="width:${(summary.High / total) * 100}%">${summary.High}</div>` : ''}
+                ${summary.Medium > 0 ? `<div class="risk-segment medium" style="width:${(summary.Medium / total) * 100}%">${summary.Medium}</div>` : ''}
+                ${summary.Low > 0 ? `<div class="risk-segment low" style="width:${(summary.Low / total) * 100}%">${summary.Low}</div>` : ''}
+            `;
+
+            // Flags
+            const flags = {};
+            assets.forEach(a => (a.flags || []).forEach(f => { flags[f] = (flags[f] || 0) + 1; }));
+            const flagIcons = { 'UNPATCHED': '⚠️', 'EOL': '⏱️', 'UNKNOWN': '❓', 'PUBLIC_FACING': '🌐', 'MISCATEGORIZED': '📋', 'REQUIRES_NAMING': '✏️', 'NO_DESCRIPTION': '📝', 'SECURITY_VIOLATION': '🚨', 'PARSE_ERROR': '❌' };
+            const flagClasses = { 'UNPATCHED': 'warning', 'EOL': 'warning', 'UNKNOWN': 'warning', 'SECURITY_VIOLATION': 'error', 'PARSE_ERROR': 'error' };
+            document.getElementById('flagsGrid').innerHTML = Object.entries(flags).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([flag, count]) => `
+                < div class="flag-card" >
+                    <div class="flag-info">
+                        <div class="flag-icon ${flagClasses[flag] || 'info'}">${flagIcons[flag] || '📌'}</div>
+                        <span class="flag-name">${flag.replace(/_/g, ' ')}</span>
+                    </div>
+                    <span class="flag-count">${count}</span>
+                </div >
+                `).join('');
+
+            // Department table
+            const depts = {};
+            assets.forEach(a => {
+                const dept = a.parsed?.department || 'Unknown';
+                if (!depts[dept]) depts[dept] = { total: 0, Critical: 0, High: 0, Medium: 0, Low: 0, riskSum: 0 };
+                depts[dept].total++;
+                depts[dept][a.risk?.level || 'Medium']++;
+                depts[dept].riskSum += a.risk?.percentage || 50;
+            });
+
+            document.getElementById('deptTable').innerHTML = Object.entries(depts).sort((a, b) => b[1].total - a[1].total).map(([dept, stats]) => {
+                const avgRisk = Math.round(stats.riskSum / stats.total);
+                const avgBadge = avgRisk > 75 ? 'badge-critical' : avgRisk > 50 ? 'badge-high' : avgRisk > 25 ? 'badge-medium' : 'badge-low';
+                return `< tr ><td><strong>${dept}</strong></td><td>${stats.total}</td><td>${stats.Critical}</td><td>${stats.High}</td><td>${stats.Medium}</td><td>${stats.Low}</td><td><span class="badge ${avgBadge}">${avgRisk}%</span></td></tr > `;
+            }).join('');
+
+            // Charts
+            renderCharts(summary, depts);
+        }
+
+        function renderCharts(summary, depts) {
+            if (riskChartInstance) riskChartInstance.destroy();
+            if (deptChartInstance) deptChartInstance.destroy();
+
+            riskChartInstance = new Chart(document.getElementById('riskChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['Critical', 'High', 'Medium', 'Low'],
+                    datasets: [{ data: [summary.Critical, summary.High, summary.Medium, summary.Low], backgroundColor: ['#dc2626', '#ea580c', '#ca8a04', '#16a34a'], borderRadius: 6 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
+            });
+
+            const deptLabels = Object.keys(depts);
+            const deptColors = ['#06b6d4', '#dc2626', '#1e40af', '#ea580c', '#7c3aed', '#059669'];
+            deptChartInstance = new Chart(document.getElementById('deptChart').getContext('2d'), {
+                type: 'doughnut',
+                data: { labels: deptLabels, datasets: [{ data: Object.values(depts).map(d => d.total), backgroundColor: deptColors.slice(0, deptLabels.length), borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#94a3b8', padding: 12 } } } }
+            });
+        }
+
+        // ============================================================
+        // VIEW SWITCHING
+        // ============================================================
+        function switchView(viewName) {
+            document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+
+            document.getElementById(`${viewName}View`).classList.add('active');
+            document.querySelector(`[data-view="${viewName}"]`).classList.add('active');
+
+            const badge = document.getElementById('roleBadge');
+            const roleText = document.getElementById('roleText');
+
+            if (viewName === 'admin') {
+                badge.className = 'role-badge admin';
+                roleText.textContent = 'Admin';
+            } else {
+                badge.className = 'role-badge executive';
+                roleText.textContent = 'Executive';
+                renderDashboard();
+            }
+        }
+
+        // ============================================================
+        // EVENT HANDLERS
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Nav tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', () => switchView(tab.dataset.view));
+            });
+
+            // Admin controls
+            document.getElementById('analyzeBtn').addEventListener('click', () => {
+                const input = document.getElementById('assetInput').value.trim();
+                if (!input) { alert('Please paste asset data'); return; }
+
+                document.getElementById('processing').classList.add('show');
+                document.getElementById('inputCard').style.display = 'none';
+                document.getElementById('results').classList.remove('show');
+
+                setTimeout(() => {
+                    const newAssets = analyzeAssets(input);
+                    allAnalyzedAssets = [...allAnalyzedAssets, ...newAssets];
+                    renderAdminResults(allAnalyzedAssets);
+                    document.getElementById('processing').classList.remove('show');
+                    document.getElementById('results').classList.add('show');
+                }, 600);
+            });
+
+            document.getElementById('clearBtn').addEventListener('click', () => {
+                document.getElementById('assetInput').value = '';
+            });
+
+            document.getElementById('newAnalysisBtn').addEventListener('click', () => {
+                document.getElementById('results').classList.remove('show');
+                document.getElementById('inputCard').style.display = 'block';
+            });
+
+            document.getElementById('publishBtn').addEventListener('click', () => {
+                switchView('dashboard');
+            });
+
+            document.getElementById('goToAdminBtn').addEventListener('click', () => {
+                switchView('admin');
+            });
+        });
+    </script>
+</body>
+
+</html>
