@@ -276,11 +276,6 @@ Risk % = Base Score + Environment + Exposure + Function + Data Residency + AI Co
 
 ---
 
-## 📜 License
-
-This project is part of the **50-Day AI Challenge** for government security operations. Internal use only.
-
----
 
 ## 👥 Contributors
 
