@@ -329,6 +329,8 @@ This project demonstrates AI-powered automation for government security operatio
 - ✅ Resource optimization
 
 ---
+Day 1_ Video Intro -https://youtu.be/xZ4ycDAfszE 
 
-*Built with 🤖 AI-assisted development*
-*SSC | Shared Services Canada*
+Day 1_ Code Build-https://youtu.be/nbpX1kPi41A
+
+Day 1_Final Cut-https://youtu.be/RZ4NxzhWFZI
