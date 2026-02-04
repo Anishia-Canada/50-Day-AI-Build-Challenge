@@ -200,22 +200,7 @@ Risk % = Base Score + Environment + Exposure + Function + Data Residency + AI Co
 └─────────────────────────────────────────────────────────────┘
 ```
 
----
 
-## 📁 Project Files
-
-| File | Description |
-|------|-------------|
-| `day1-federated-asset-platform-FINAL.html` | Main application (single-file SPA) |
-| `day1-ai-value-proposition.md` | AI justification and value metrics |
-| `finalized-risk-calculation-summary.md` | Risk calculation documentation v2.0 |
-| `day1-exception-handling-registry.md` | 20 exceptions (EXC-001 to EXC-020) |
-| `day1-synthetic-asset-dataset.md` | 250 test assets for validation |
-| `day1-dashboard-design.md` | Dashboard UI specification |
-| `day1-security-by-design.md` | Security considerations |
-| `day1-isaca-ai-audit.md` | ISACA AI auditing report |
-
----
 
 ## 🔐 Security Considerations
 
