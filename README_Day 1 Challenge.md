@@ -1,5 +1,5 @@
 # Federated Asset Inventory Platform
-## Day 1 | 50-Day AI Challenge | SSC (Shared Services Canada)
+## Day 1 | 50-Day AI Challenge | 
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![Status](https://img.shields.io/badge/status-complete-green)
@@ -9,7 +9,7 @@
 
 ## 🎯 Overview
 
-The **Federated Asset Inventory Platform** is an AI-powered web application that transforms semi-structured asset data into classified, risk-assessed, and zone-recommended inventory entries. Built for government security operations, it enables administrators to paste raw asset information and receive instant AI analysis with executive dashboard visualization.
+The **Federated Asset Inventory Platform** is an AI-powered web application that transforms semi-structured asset data into classified, risk-assessed, and zone-recommended inventory entries. Built for government security operations(a hypothetical scenario), it enables administrators to paste raw asset information and receive instant AI analysis with executive dashboard visualization.
 
 ### The Problem
 - Manual asset classification takes 15-30 minutes per asset
@@ -212,7 +212,7 @@ Risk % = Base Score + Environment + Exposure + Function + Data Residency + AI Co
 
 ---
 
-## 🏛️ Government Context
+## 🏛️ Government Context(Hypothetical Scenario)
 
 ### Departments Supported
 - CRA (Canada Revenue Agency)
@@ -222,7 +222,7 @@ Risk % = Base Score + Environment + Exposure + Function + Data Residency + AI Co
 - Service Ontario
 - City of Halifax
 
-### Standards Referenced
+### Standards Referenced(Public Sources)
 - **ITSG-22** - Baseline Security Requirements for Network Security Zones
 - **ITSG-38** - Network Security Zoning
 - **TBS Directive on Security Management** - Data categorization
@@ -263,6 +263,7 @@ Risk % = Base Score + Environment + Exposure + Function + Data Residency + AI Co
 
 ---
 
+## Tracking Progress
 
 
 ## 🏆 50-Day AI Challenge
@@ -282,3 +283,8 @@ Day 1_ Video Intro -https://youtu.be/xZ4ycDAfszE
 Day 1_ Code Build-https://youtu.be/nbpX1kPi41A
 
 Day 1_Final Cut-https://youtu.be/RZ4NxzhWFZI
+  
+
+
+
+  **Day 2 of 50** | Project 2 of 50
