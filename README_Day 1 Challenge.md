@@ -284,7 +284,3 @@ Day 1_ Code Build-https://youtu.be/nbpX1kPi41A
 
 Day 1_Final Cut-https://youtu.be/RZ4NxzhWFZI
   
-
-
-
-  **Day 2 of 50** | Project 2 of 50
